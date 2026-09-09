@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Control de Artes de Empaque</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <div class="eyebrow">CONTROL DE PROCESO · REBRANDING</div>
+    <h1>Aprobación de Artes de Empaque</h1>
+    <p>Seguimiento de materiales, responsables, fechas límite y porcentaje de avance.</p>
+  </div>
+  <div class="top-actions">
+    <button class="btn secondary" id="importBtn">📥 Importar Excel</button>
+    <button class="btn secondary" id="exportBtn">📤 Exportar Excel</button>
+    <button class="btn primary" id="newBtn">＋ Nuevo registro</button>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+  </div>
+</header>
+
+<main class="container">
+  <section class="stats">
+    <article class="stat"><span>Registros totales</span><strong id="total">0</strong></article>
+    <article class="stat"><span>Completos</span><strong id="complete">0</strong></article>
+    <article class="stat"><span>En proceso</span><strong id="process">0</strong></article>
+    <article class="stat alert"><span>Con alerta / rechazo</span><strong id="alerts">0</strong></article>
+  </section>
+
+  <section class="panel toolbar">
+    <div class="tabs">
+      <button class="tab active" data-view="tracking">Seguimiento</button>
+      <button class="tab" data-view="analysis">Análisis</button>
+    </div>
+    <div class="filters">
+      <input id="search" placeholder="Buscar por nombre, código, proveedor o material…">
+      <select id="statusFilter">
+        <option value="">Todos los estados</option>
+        <option>Aprobado</option><option>En proceso</option><option>Pendiente</option>
+        <option>Rechazado</option><option>Vencido</option>
+      </select>
+      <select id="areaFilter"><option value="">Todas las áreas</option></select>
+    </div>
+  </section>
+
+  <section id="trackingView" class="view">
+    <div class="panel">
+      <div class="panel-title">
+        <div><h2>Seguimiento de artes</h2><span id="updated">Actualizado: —</span></div>
+        <span class="badge" id="recordCount">0 registros</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Material</th><th>Código</th><th>Proveedor</th><th>Área</th>
+            <th>Responsable</th><th>Avance</th><th>Estado</th><th>Límite</th><th></th>
+          </tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div id="empty" class="empty">
+        <div class="empty-icon">📋</div>
+        <h3>Aún no hay registros</h3>
+        <p>Importa un Excel o crea el primer registro.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="analysisView" class="view hidden">
+    <div class="analysis-grid">
+      <article class="panel kpi"><span>Artes totales</span><strong id="aTotal">0</strong></article>
+      <article class="panel kpi"><span>Avance general</span><strong id="aProgress">0%</strong></article>
+      <article class="panel kpi"><span>Completadas</span><strong id="aComplete">0</strong></article>
+      <article class="panel kpi"><span>Con atraso</span><strong id="aLate">0</strong></article>
+      <article class="panel kpi"><span>Próximas a vencer</span><strong id="aSoon">0</strong></article>
+    </div>
+
+    <div class="analysis-columns">
+      <section class="panel">
+        <div class="panel-title"><h2>Avance por área</h2></div>
+        <div id="areaAnalysis"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-title"><h2>Atención requerida</h2></div>
+        <div class="attention-list" id="attention"></div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="panel-title"><h2>Cuello de botella actual</h2></div>
+      <div id="bottleneck" class="bottleneck">Sin datos suficientes.</div>
+    </section>
+  </section>
+</main>
+
+<div class="modal hidden" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h2 id="modalTitle">Registrar material / arte</h2><button class="icon-btn" id="closeModal">×</button></div>
+    <form id="recordForm">
+      <div class="form-grid">
+        <label>Fecha de recepción<input type="date" id="fReception" required></label>
+        <label>Código de material<input id="fCode" placeholder="Ej. 30000416" required></label>
+        <label>Nombre / material<input id="fMaterial" placeholder="Ej. POLIETILENO CREMA 20" required></label>
+        <label>Proveedor<input id="fSupplier" placeholder="Ej. FLEXIPLAST S.A."></label>
+        <label>Unidad<input id="fUnit" placeholder="KG / UN"></label>
+        <label>Área / etapa<input id="fArea" placeholder="Diseño / Calidad / Comercial"></label>
+        <label>Porcentaje completado<input type="number" id="fProgress" min="0" max="100" value="0"></label>
+        <label>Estado<select id="fStatus"><option>Pendiente</option><option>En proceso</option><option>Aprobado</option><option>Rechazado</option><option>Vencido</option></select></label>
+        <label>Responsable<input id="fResponsible" placeholder="Nombre / área responsable"></label>
+        <label>Fecha límite<input type="date" id="fDue"></label>
+        <label>Fecha de actualización<input type="date" id="fUpdated"></label>
+        <label class="full">Comentario<textarea id="fComment" rows="3"></textarea></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn secondary" id="cancelBtn">Cancelar</button><button class="btn primary">Guardar</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
